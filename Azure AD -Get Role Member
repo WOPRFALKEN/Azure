@@ -1,0 +1,10 @@
+connect-azuread
+#get all groups
+Get-AzureADDirectoryRole | select displayname
+
+$role = Get-AzureADDirectoryRole | Where-Object {$_.displayName -eq 'Company Administrator'}
+
+Get-AzureADDirectoryRoleMember -ObjectId $role.ObjectId | Get-AzureADUser | select displayname,user
+principalname | Export-Csv "C:\Users\lap-top\Downloads\1.csv" -NoType
+
+
