@@ -1,0 +1,30 @@
+Login-AzureRmAccount
+Set-AzureRmContext -SubscriptionId "subscriptionid"
+
+$accountKeys = Get-AzureRmStorageAccountKey -ResourceGroupName "test" -Name "mystorageaccount201806"
+
+#The Storage Context object itself is what enables us to authenticate to the Azure Storage REST API from PowerShell.
+
+$storageContext = New-AzureStorageContext -StorageAccountName "mystorageaccount201806" -StorageAccountKey $accountKeys[0].Value
+
+#SAS key expiry time
+
+$expiryTime = (get-date).AddYears(1)
+
+#set perimissions:r-readmw-write-l-list
+
+$permission = "rwl"
+
+#Create policy
+
+New-AzureStorageContainerStoredAccessPolicy -Context $storageContext -Container "test" -Policy "test" -ExpiryTime $expiryTime -Permission $permission
+
+#Get token
+
+$sasToken = New-AzureStorageContainerSASToken -Name "test" -Policy "test" -Context $storageContext
+$sasToken = $sasToken.substring(1)
+
+#Write-Host "SAS token (ref shared access policy): $sasToken"
+
+$sasToken2 = New-AzureStorageContainerSASToken -Context $storageContext -Container tibp-userprofiles -Permission rwl
+#Write-Host 'SAS token: ' $($sasToken2)
